@@ -1,4 +1,4 @@
-// how to run:
+﻿// how to run:
 // 1. install dotnet runtime https://learn.microsoft.com/en-us/dotnet/core/install/linux-scripted-manual#scripted-install
 // 2. export DOTNET_ROOT=$HOME/.dotnet
 // 3. export PATH=$PATH:$HOME/.dotnet:$HOME/.dotnet/tools
@@ -10,9 +10,9 @@ using MongoDB.Bson;
 
 const string connectionUri = "mongodb://localhost:27017/?directConnection=true";
 
-var client = new MongoClient(connectionUri);
-
 var settings = MongoClientSettings.FromConnectionString(connectionUri);
+
+var client = new MongoClient(connectionUri);
 
 var collection = client.GetDatabase("test").GetCollection<BsonDocument>("foo");
 
