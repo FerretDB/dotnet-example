@@ -1,7 +1,7 @@
-# MongoDB .NET example
+# FerretDB .NET example
 
 This is a fork of https://github.com/mongodb-developer/mongodb-dotnet-example,
-reduced to reproduce a problem with FerretDB.
+reduced to reproduce a (already fixed) problem with FerretDB.
 
 How to run:
 
