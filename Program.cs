@@ -9,6 +9,4 @@ var collection = client.GetDatabase("test").GetCollection<BsonDocument>("foo");
 
 var filter = Builders<BsonDocument>.Filter.Eq("name", "foo");
 
-var res = collection.Find(filter).FirstOrDefault();
-
-Console.WriteLine(res);
+_ = collection.Find(filter).FirstOrDefault();
