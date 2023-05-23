@@ -1,3 +1,0 @@
-[submodule "mongodb-dotnet-example"]
-	path = mongodb-dotnet-example
-	url = https://github.com/mongodb-developer/mongodb-dotnet-example.git
