@@ -6,4 +6,4 @@ reduced to reproduce a (already fixed) problem with FerretDB.
 How to run:
 
 1. Install `dotnet` tool.
-2. Run `dotnet run`.
+2. Run `dotnet run mongodb://localhost:27017 mongodb://username:password@localhost:27017/?authMechanism=PLAIN`.
