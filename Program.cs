@@ -6,8 +6,12 @@ public static class Example
     public static void Main(string[] args)
     {
         foreach (Object obj in args) {
-            string connectionUri = obj.ToString();
-            var client = new MongoClient(connectionUri);
+            var settings = MongoClientSettings.FromConnectionString(obj.ToString());
+            // https://jira.mongodb.org/browse/CSHARP-3516
+            // Set the ServerApi field of the settings object to Stable API version 1
+            // to force the handshake to use OP_MSG.
+            settings.ServerApi = new ServerApi(ServerApiVersion.V1);
+            var client = new MongoClient(settings);
 
             IMongoDatabase db = client.GetDatabase("test");
             var command = new BsonDocument { { "ping", 1 } };
