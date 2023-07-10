@@ -9,7 +9,7 @@ public static class Example
             var settings = MongoClientSettings.FromConnectionString(obj.ToString());
             // https://jira.mongodb.org/browse/CSHARP-3516
             // Set the ServerApi field of the settings object to Stable API version 1
-            // to force the handshake to use OP_MSG.
+            // to force OP_MSG to be used in hello command during handshake.
             settings.ServerApi = new ServerApi(ServerApiVersion.V1);
             var client = new MongoClient(settings);
 
