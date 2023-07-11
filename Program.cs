@@ -5,10 +5,6 @@ public static class Example
 {
     public static void Main(string[] args)
     {
-        if (args.Length > 1) {
-            Console.WriteLine("too many arguments");
-            System.Environment.Exit(2);
-        }
         var settings = MongoClientSettings.FromConnectionString(args[0].ToString());
         // https://jira.mongodb.org/browse/CSHARP-3516
         // Set the ServerApi field of the settings object to Stable API version 1
