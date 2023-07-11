@@ -7,7 +7,7 @@ public static class Example
     {
         if (args.Length > 1) {
             Console.WriteLine("too many arguments");
-            System.Environment.Exit(1);
+            System.Environment.Exit(2);
         }
         var settings = MongoClientSettings.FromConnectionString(args[0].ToString());
         // https://jira.mongodb.org/browse/CSHARP-3516
