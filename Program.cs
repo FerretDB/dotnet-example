@@ -1,12 +1,19 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Bson;
 
-const string connectionUri = "mongodb://localhost:27017/";
+public static class Example
+{
+    public static void Main(string[] args)
+    {
+        var client = new MongoClient(args[0].ToString());
 
-var client = new MongoClient(connectionUri);
+        IMongoDatabase db = client.GetDatabase("test");
+        var command = new BsonDocument { { "ping", 1 } };
+        var res = db.RunCommand<BsonDocument>(command);
 
-var collection = client.GetDatabase("test").GetCollection<BsonDocument>("foo");
+        Console.WriteLine(res);
 
-var filter = Builders<BsonDocument>.Filter.Eq("name", "foo");
-
-_ = collection.Find(filter).FirstOrDefault();
+        // prevents https://jira.mongodb.org/browse/CSHARP-3429
+        client.Cluster.Dispose();
+    }
+}
