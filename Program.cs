@@ -8,14 +8,6 @@ public static class Example
     {
         var connectionUri = args[0].ToString();
         var settings = MongoClientSettings.FromConnectionString(connectionUri);
-        
-        // if set in the YAML file
-        if (args.Last() == "StableAPI")
-        {
-            settings.ServerApi = new ServerApi(ServerApiVersion.V1, strict: true,
-                deprecationErrors: true);
-
-        }
  
         var client = new MongoClient(settings);
 
