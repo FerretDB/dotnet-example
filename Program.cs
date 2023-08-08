@@ -8,18 +8,15 @@ public static class Example
     {
         var connectionUri = args[0].ToString();
         var settings = MongoClientSettings.FromConnectionString(connectionUri);
- 
         var client = new MongoClient(settings);
 
         IMongoDatabase db = client.GetDatabase("test");
         var command = new BsonDocument { { "ping", 1 } };
         var res = db.RunCommand<BsonDocument>(command);
-
         Console.WriteLine(res);
 
         command = new BsonDocument { { "dropDatabase", 1 } };
         res = db.RunCommand<BsonDocument>(command);
-
         Console.WriteLine(res);
 
         var documentList = new List<BsonDocument>();
