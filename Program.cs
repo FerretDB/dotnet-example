@@ -31,8 +31,7 @@ public static class Example
 
         var filter = Builders<BsonDocument>.Filter.Eq("a", 4);
         BsonDocument actual = collection.Find(filter).ToList().Last();
-        var expected = new BsonDocument { { "_id", 4 }, { "a", 4 } };
-        Debug.Assert(expected == actual, "Value should be 4");
+        Debug.Assert(actual == new BsonDocument { { "_id", 4 }, { "a", 4 } }, "Value should be 4");
 
         // prevents https://jira.mongodb.org/browse/CSHARP-3429
         client.Cluster.Dispose();
