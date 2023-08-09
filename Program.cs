@@ -13,30 +13,26 @@ public static class Example
         IMongoDatabase db = client.GetDatabase("test");
         var command = new BsonDocument { { "ping", 1 } };
         var res = db.RunCommand<BsonDocument>(command);
-        Console.WriteLine(res);
+        Debug.Assert(res == new BsonDocument { { "ok", 1.0 } }, "ping failed");
 
         command = new BsonDocument { { "dropDatabase", 1 } };
         res = db.RunCommand<BsonDocument>(command);
-        Console.WriteLine(res);
+        Debug.Assert(res == new BsonDocument { { "ok", 1.0 } }, "dropDatabase failed");
 
-        var documentList = new List<BsonDocument>();
-        for (int i = 1; i < 5; i++)
-        {
-            var document = new BsonDocument{ {"_id", i }, { "a", i } };
-            documentList.Add(document);
-        }
+        var documentList = new List<BsonDocument>{
+            new BsonDocument{ { "_id", 1 }, { "a", 1 } },
+            new BsonDocument{ { "_id", 2 }, { "a", 2 } },
+            new BsonDocument{ { "_id", 3 }, { "a", 3 } },
+            new BsonDocument{ { "_id", 4 }, { "a", 4 } },
+        };
 
-        // insert documents
         var collection = db.GetCollection<BsonDocument> ("foo");
         collection.InsertMany(documentList);
 
-        // find the document
         var filter = Builders<BsonDocument>.Filter.Eq("a", 4);
-        var resList = collection.Find(filter).ToList();
-        BsonDocument actual = resList.Last(); 
-
+        BsonDocument actual = collection.Find(filter).ToList().Last();
         var expected = new BsonDocument { { "_id", 4 }, { "a", 4 } };
-        Debug.Assert(expected == actual, " Value should be 4");
+        Debug.Assert(expected == actual, "Value should be 4");
 
         // prevents https://jira.mongodb.org/browse/CSHARP-3429
         client.Cluster.Dispose();
