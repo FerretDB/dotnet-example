@@ -26,7 +26,7 @@ public static class Example
             new BsonDocument { { "_id", 4 }, { "a", 4 } },
         };
 
-        var collection = db.GetCollection<BsonDocument> ("foo");
+        var collection = db.GetCollection<BsonDocument>("foo");
         collection.InsertMany(documentList);
 
         var filter = Builders<BsonDocument>.Filter.Eq("a", 4);
