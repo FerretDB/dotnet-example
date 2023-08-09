@@ -20,10 +20,10 @@ public static class Example
         Debug.Assert(res == new BsonDocument { { "ok", 1.0 } }, "dropDatabase failed");
 
         var documentList = new List<BsonDocument>{
-            new BsonDocument{ { "_id", 1 }, { "a", 1 } },
-            new BsonDocument{ { "_id", 2 }, { "a", 2 } },
-            new BsonDocument{ { "_id", 3 }, { "a", 3 } },
-            new BsonDocument{ { "_id", 4 }, { "a", 4 } },
+            new BsonDocument { { "_id", 1 }, { "a", 1 } },
+            new BsonDocument { { "_id", 2 }, { "a", 2 } },
+            new BsonDocument { { "_id", 3 }, { "a", 3 } },
+            new BsonDocument { { "_id", 4 }, { "a", 4 } },
         };
 
         var collection = db.GetCollection<BsonDocument> ("foo");
