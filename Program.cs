@@ -30,7 +30,7 @@ public static class Example
         collection.InsertMany(documentList);
 
         var filter = Builders<BsonDocument>.Filter.Eq("a", 4);
-        BsonDocument actual = collection.Find(filter).ToList().Last();
+        BsonDocument actual = collection.Find(filter).FirstOrDefault();
         Debug.Assert(actual == new BsonDocument { { "_id", 4 }, { "a", 4 } }, "Value should be 4");
 
         // prevents https://jira.mongodb.org/browse/CSHARP-3429
