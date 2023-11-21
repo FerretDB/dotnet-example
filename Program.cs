@@ -13,11 +13,11 @@ public static class Example
         IMongoDatabase db = client.GetDatabase("test");
         var command = new BsonDocument { { "ping", 1 } };
         var res = db.RunCommand<BsonDocument>(command);
-        Debug.Assert(res == new BsonDocument { { "ok", 1.0 } }, "ping failed");
+        Debug.Assert(res["ok"].ToDouble() == 1.0, "ping failed");
 
         command = new BsonDocument { { "dropDatabase", 1 } };
         res = db.RunCommand<BsonDocument>(command);
-        Debug.Assert(res == new BsonDocument { { "ok", 1.0 } }, "dropDatabase failed");
+        Debug.Assert(res["ok"].ToDouble() == 1.0, "dropDatabase failed");
 
         var documentList = new List<BsonDocument>{
             new BsonDocument { { "_id", 1 }, { "a", 1 } },
