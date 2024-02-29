@@ -1,0 +1,15 @@
+---
+
+version: 2
+updates:
+
+  # Maintain dependencies for .NET
+  - package-ecosystem: "nuget"
+    directory: "/"
+    assignees: [b1ron]
+    open-pull-requests-limit: 5
+    schedule:
+      # Checks for updates 10 minutes before dance.
+      interval: "weekly"
+      day: "thursday"
+      time: "01:32"
