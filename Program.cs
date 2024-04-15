@@ -1,13 +1,26 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Diagnostics;
+using McMaster.Extensions.CommandLineUtils;
 
-public static class Example
+public class Example
 {
-    public static void Main(string[] args)
+    public static void Main(string[] args) => CommandLineApplication.Execute<Example>(args);
+
+    [Option(Description = "MongoDB connection string")]
+    public string? ConnectionString { get; }
+
+    [Option(Description = "Enable strict stable API mode")]
+    public bool Strict { get; } = false;
+
+    private void OnExecute()
     {
-        var connectionUri = args[0].ToString();
-        var settings = MongoClientSettings.FromConnectionString(connectionUri);
+        if (Strict)
+        {
+            Console.WriteLine("TODO: enable the strict stable API mode on the client");
+        }
+
+        var settings = MongoClientSettings.FromConnectionString(ConnectionString);
         var client = new MongoClient(settings);
 
         IMongoDatabase db = client.GetDatabase("test");
