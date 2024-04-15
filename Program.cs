@@ -15,12 +15,13 @@ public class Example
 
     private void OnExecute()
     {
+        var settings = MongoClientSettings.FromConnectionString(ConnectionString);
         if (Strict)
-        {
-            Console.WriteLine("TODO: enable the strict stable API mode on the client");
+        {   
+            var serverApi = new ServerApi(ServerApiVersion.V1, strict: true);
+            settings.ServerApi = serverApi;
         }
 
-        var settings = MongoClientSettings.FromConnectionString(ConnectionString);
         var client = new MongoClient(settings);
 
         IMongoDatabase db = client.GetDatabase("test");
