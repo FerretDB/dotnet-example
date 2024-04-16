@@ -21,48 +21,51 @@ public static class Example
 
         var parseResult = rootCommand.Parse(args);
         var connectionStringValue = parseResult.GetValueForArgument(connectionString);
-        Console.WriteLine($"Connection string: {connectionStringValue}");
+        var strictValue = parseResult.GetValueForOption(strict);
 
-        rootCommand.SetHandler(Handle());
+        rootCommand.SetHandler(Handle(connectionStringValue, strictValue));
 
         return rootCommand.Invoke(args);
     }
 
-    private static Action<InvocationContext> Handle()
+    private static Action<InvocationContext> Handle(string connectionString, bool? strict)
     {
-        // if (Convert.ToBoolean(strict))
-        // {
-        //     var serverApi = new ServerApi(ServerApiVersion.V1, strict: true);
-        //     settings.ServerApi = serverApi;
-        // }
+        var settings = MongoClientSettings.FromConnectionString(connectionString);
 
-        // var client = new MongoClient(settings);
+        if (Convert.ToBoolean(strict))
+        {
+            var serverApi = new ServerApi(ServerApiVersion.V1, strict: true);
+            settings.ServerApi = serverApi;
+        }
 
-        // IMongoDatabase db = client.GetDatabase("test");
-        // var command = new BsonDocument { { "ping", 1 } };
-        // var res = db.RunCommand<BsonDocument>(command);
-        // Debug.Assert(res["ok"].ToDouble() == 1.0, "ping failed");
+        var client = new MongoClient(settings);
 
-        // command = new BsonDocument { { "dropDatabase", 1 } };
-        // res = db.RunCommand<BsonDocument>(command);
-        // Debug.Assert(res["ok"].ToDouble() == 1.0, "dropDatabase failed");
+        IMongoDatabase db = client.GetDatabase("test");
+        var command = new BsonDocument { { "ping", 1 } };
+        var res = db.RunCommand<BsonDocument>(command);
+        Debug.Assert(res["ok"].ToDouble() == 1.0, "ping failed");
 
-        // var documentList = new List<BsonDocument>{
-        //     new BsonDocument { { "_id", 1 }, { "a", 1 } },
-        //     new BsonDocument { { "_id", 2 }, { "a", 2 } },
-        //     new BsonDocument { { "_id", 3 }, { "a", 3 } },
-        //     new BsonDocument { { "_id", 4 }, { "a", 4 } },
-        // };
+        command = new BsonDocument { { "dropDatabase", 1 } };
+        res = db.RunCommand<BsonDocument>(command);
+        Debug.Assert(res["ok"].ToDouble() == 1.0, "dropDatabase failed");
 
-        // var collection = db.GetCollection<BsonDocument>("foo");
-        // collection.InsertMany(documentList);
+        var documentList = new List<BsonDocument>{
+            new BsonDocument { { "_id", 1 }, { "a", 1 } },
+            new BsonDocument { { "_id", 2 }, { "a", 2 } },
+            new BsonDocument { { "_id", 3 }, { "a", 3 } },
+            new BsonDocument { { "_id", 4 }, { "a", 4 } },
+        };
 
-        // var filter = Builders<BsonDocument>.Filter.Eq("a", 4);
-        // BsonDocument actual = collection.Find(filter).FirstOrDefault();
-        // Debug.Assert(actual == new BsonDocument { { "_id", 4 }, { "a", 4 } }, "Value should be 4");
+        var collection = db.GetCollection<BsonDocument>("foo");
+        collection.InsertMany(documentList);
 
-        // // prevents https://jira.mongodb.org/browse/CSHARP-3429
-        // client.Cluster.Dispose();
+        var filter = Builders<BsonDocument>.Filter.Eq("a", 4);
+        BsonDocument actual = collection.Find(filter).FirstOrDefault();
+        Debug.Assert(actual == new BsonDocument { { "_id", 4 }, { "a", 4 } }, "Value should be 4");
+
+        // prevents https://jira.mongodb.org/browse/CSHARP-3429
+        client.Cluster.Dispose();
+
         return (context) => { };
     }
 
