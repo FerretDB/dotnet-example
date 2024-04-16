@@ -28,8 +28,6 @@ public static class Example
             {
                 var serverApi = new ServerApi(ServerApiVersion.V1, strict: true);
                 settings.ServerApi = serverApi;
-
-                Console.WriteLine("Using strict stable API mode");
             }
 
             var client = new MongoClient(settings);
