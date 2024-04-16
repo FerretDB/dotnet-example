@@ -18,8 +18,8 @@ public static class Example
         strict.SetDefaultValue(false);
 
         var rootCommand = new RootCommand("A simple example of using MongoDB with .NET Core");
-        rootCommand.AddOption(strict);
         rootCommand.AddArgument(connectionString);
+        rootCommand.AddOption(strict);
 
         rootCommand.SetHandler((connectionString, strict) =>
         {
@@ -64,5 +64,5 @@ public static class Example
 
         return rootCommand.Invoke(args);
     }
-    
+
 }
