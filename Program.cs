@@ -1,26 +1,35 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Diagnostics;
-using Microsoft.Extensions.CommandLineUtils;
+using System.CommandLine;
 
-public class Example
+public static class Example
 {
-    public static void Main(string[] args)
+    public static int Main(string[] args)
     {
-        var commandLineApplication = new CommandLineApplication();
-        commandLineApplication.Name = ".NET Example";
-        commandLineApplication.Description = "A simple example of using MongoDB with .NET Core";
+        var connectionString = new Argument<string>(
+            name: "connectionString",
+            description: "MongoDB connection string");
 
-        var connectionString = commandLineApplication.Argument("connectionString", "MongoDB connection string");
-        var strict = commandLineApplication.Option("-s | --strict", "Use strict stable API mode", CommandOptionType.NoValue);
+        var strict = new Option<bool?>(
+        name: "--strict",
+        description: "Use strict stable API mode.");
+        strict.AddAlias("-s");
+        strict.SetDefaultValue(false);
 
-        commandLineApplication.OnExecute(() =>
+        var rootCommand = new RootCommand("A simple example of using MongoDB with .NET Core");
+        rootCommand.AddOption(strict);
+        rootCommand.AddArgument(connectionString);
+
+        rootCommand.SetHandler((connectionString, strict) =>
         {
-            var settings = MongoClientSettings.FromConnectionString(connectionString.Value);
-            if (strict.HasValue())
+            var settings = MongoClientSettings.FromConnectionString(connectionString);
+            if (Convert.ToBoolean(strict))
             {
                 var serverApi = new ServerApi(ServerApiVersion.V1, strict: true);
                 settings.ServerApi = serverApi;
+
+                Console.WriteLine("Using strict stable API mode");
             }
 
             var client = new MongoClient(settings);
@@ -51,10 +60,9 @@ public class Example
             // prevents https://jira.mongodb.org/browse/CSHARP-3429
             client.Cluster.Dispose();
 
-            return 0;
-        });
+        }, connectionString, strict);
 
-        commandLineApplication.Execute(args);
+        return rootCommand.Invoke(args);
     }
     
 }
