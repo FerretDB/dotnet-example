@@ -23,7 +23,7 @@ public static class Example
         return rootCommand.Invoke(args);
     }
 
-    static Action<InvocationContext> Handle(Argument<string> connectionString, Option<bool?> strict)
+    private static Action<InvocationContext> Handle(Argument<string> connectionString, Option<bool?> strict)
     {
         var settings = MongoClientSettings.FromConnectionString(Convert.ToString(connectionString));
         if (Convert.ToBoolean(strict))
