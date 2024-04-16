@@ -2,18 +2,15 @@
 using MongoDB.Bson;
 using System.Diagnostics;
 using System.CommandLine;
+using System.CommandLine.Invocation;
 
 public static class Example
 {
     public static int Main(string[] args)
     {
-        var connectionString = new Argument<string>(
-        name: "connectionString",
-        description: "MongoDB connection string");
+        var connectionString = new Argument<string>(name: "connectionString", description: "MongoDB connection string");
 
-        var strict = new Option<bool?>(
-        name: "--strict",
-        description: "Use strict stable API mode.");
+        var strict = new Option<bool?>(name: "--strict", description: "Use strict stable API mode.");
         strict.AddAlias("-s");
         strict.SetDefaultValue(false);
 
@@ -21,46 +18,48 @@ public static class Example
         rootCommand.AddArgument(connectionString);
         rootCommand.AddOption(strict);
 
-        rootCommand.SetHandler((connectionString, strict) =>
-        {
-            var settings = MongoClientSettings.FromConnectionString(connectionString);
-            if (Convert.ToBoolean(strict))
-            {
-                var serverApi = new ServerApi(ServerApiVersion.V1, strict: true);
-                settings.ServerApi = serverApi;
-            }
-
-            var client = new MongoClient(settings);
-
-            IMongoDatabase db = client.GetDatabase("test");
-            var command = new BsonDocument { { "ping", 1 } };
-            var res = db.RunCommand<BsonDocument>(command);
-            Debug.Assert(res["ok"].ToDouble() == 1.0, "ping failed");
-
-            command = new BsonDocument { { "dropDatabase", 1 } };
-            res = db.RunCommand<BsonDocument>(command);
-            Debug.Assert(res["ok"].ToDouble() == 1.0, "dropDatabase failed");
-
-            var documentList = new List<BsonDocument>{
-                new BsonDocument { { "_id", 1 }, { "a", 1 } },
-                new BsonDocument { { "_id", 2 }, { "a", 2 } },
-                new BsonDocument { { "_id", 3 }, { "a", 3 } },
-                new BsonDocument { { "_id", 4 }, { "a", 4 } },
-            };
-
-            var collection = db.GetCollection<BsonDocument>("foo");
-            collection.InsertMany(documentList);
-
-            var filter = Builders<BsonDocument>.Filter.Eq("a", 4);
-            BsonDocument actual = collection.Find(filter).FirstOrDefault();
-            Debug.Assert(actual == new BsonDocument { { "_id", 4 }, { "a", 4 } }, "Value should be 4");
-
-            // prevents https://jira.mongodb.org/browse/CSHARP-3429
-            client.Cluster.Dispose();
-
-        }, connectionString, strict);
+        rootCommand.SetHandler(Handle(connectionString, strict));
 
         return rootCommand.Invoke(args);
+    }
+
+    static Action<InvocationContext> Handle(Argument<string> connectionString, Option<bool?> strict)
+    {
+        var settings = MongoClientSettings.FromConnectionString(Convert.ToString(connectionString));
+        if (Convert.ToBoolean(strict))
+        {
+            var serverApi = new ServerApi(ServerApiVersion.V1, strict: true);
+            settings.ServerApi = serverApi;
+        }
+
+        var client = new MongoClient(settings);
+
+        IMongoDatabase db = client.GetDatabase("test");
+        var command = new BsonDocument { { "ping", 1 } };
+        var res = db.RunCommand<BsonDocument>(command);
+        Debug.Assert(res["ok"].ToDouble() == 1.0, "ping failed");
+
+        command = new BsonDocument { { "dropDatabase", 1 } };
+        res = db.RunCommand<BsonDocument>(command);
+        Debug.Assert(res["ok"].ToDouble() == 1.0, "dropDatabase failed");
+
+        var documentList = new List<BsonDocument>{
+            new BsonDocument { { "_id", 1 }, { "a", 1 } },
+            new BsonDocument { { "_id", 2 }, { "a", 2 } },
+            new BsonDocument { { "_id", 3 }, { "a", 3 } },
+            new BsonDocument { { "_id", 4 }, { "a", 4 } },
+        };
+
+        var collection = db.GetCollection<BsonDocument>("foo");
+        collection.InsertMany(documentList);
+
+        var filter = Builders<BsonDocument>.Filter.Eq("a", 4);
+        BsonDocument actual = collection.Find(filter).FirstOrDefault();
+        Debug.Assert(actual == new BsonDocument { { "_id", 4 }, { "a", 4 } }, "Value should be 4");
+
+        // prevents https://jira.mongodb.org/browse/CSHARP-3429
+        client.Cluster.Dispose();
+        return (context) => { };
     }
 
 }
