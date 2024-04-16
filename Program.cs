@@ -8,8 +8,8 @@ public static class Example
     public static int Main(string[] args)
     {
         var connectionString = new Argument<string>(
-            name: "connectionString",
-            description: "MongoDB connection string");
+        name: "connectionString",
+        description: "MongoDB connection string");
 
         var strict = new Option<bool?>(
         name: "--strict",
