@@ -1,13 +1,43 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Diagnostics;
+using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
 
 public static class Example
 {
-    public static void Main(string[] args)
+    public static int Main(string[] args)
     {
-        var connectionUri = args[0].ToString();
-        var settings = MongoClientSettings.FromConnectionString(connectionUri);
+        var connectionString = new Argument<string>(name: "connectionString", description: "MongoDB connection string");
+
+        var strict = new Option<bool?>(name: "--strict", description: "Use strict stable API mode.");
+        strict.AddAlias("-s");
+        strict.SetDefaultValue(false);
+
+        var rootCommand = new RootCommand("A simple example of using MongoDB with .NET Core");
+        rootCommand.AddArgument(connectionString);
+        rootCommand.AddOption(strict);
+
+        var parseResult = rootCommand.Parse(args);
+        var connectionStringValue = parseResult.GetValueForArgument(connectionString);
+        var strictValue = parseResult.GetValueForOption(strict);
+
+        rootCommand.SetHandler(Handle(connectionStringValue, strictValue));
+
+        return rootCommand.Invoke(args);
+    }
+
+    private static Action<InvocationContext> Handle(string connectionString, bool? strict)
+    {
+        var settings = MongoClientSettings.FromConnectionString(connectionString);
+
+        if (Convert.ToBoolean(strict))
+        {
+            var serverApi = new ServerApi(ServerApiVersion.V1, strict: true);
+            settings.ServerApi = serverApi;
+        }
+
         var client = new MongoClient(settings);
 
         IMongoDatabase db = client.GetDatabase("test");
@@ -35,5 +65,8 @@ public static class Example
 
         // prevents https://jira.mongodb.org/browse/CSHARP-3429
         client.Cluster.Dispose();
+
+        return (context) => { };
     }
+
 }
