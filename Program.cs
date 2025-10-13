@@ -2,33 +2,32 @@
 using MongoDB.Bson;
 using System.Diagnostics;
 using System.CommandLine;
-using System.CommandLine.Invocation;
-using System.CommandLine.Parsing;
 
 public static class Example
 {
     public static int Main(string[] args)
     {
-        var connectionString = new Argument<string>(name: "connectionString", description: "MongoDB connection string");
+        var connectionString = new Argument<string>("connectionString");
+        connectionString.Description = "MongoDB connection string";
 
-        var strict = new Option<bool?>(name: "--strict", description: "Use strict stable API mode.");
-        strict.AddAlias("-s");
-        strict.SetDefaultValue(false);
+        var strict = new Option<bool?>("--strict", new[] { "-s" });
+        strict.Description = "Use strict stable API mode.";
+        strict.DefaultValueFactory = _ => false;
 
         var rootCommand = new RootCommand("A simple example of using MongoDB with .NET Core");
-        rootCommand.AddArgument(connectionString);
-        rootCommand.AddOption(strict);
+        rootCommand.Add(connectionString);
+        rootCommand.Add(strict);
+
+        rootCommand.SetAction((parseResult) => 
+        {
+            Handle(parseResult.GetRequiredValue(connectionString), parseResult.GetValue(strict));
+        });
 
         var parseResult = rootCommand.Parse(args);
-        var connectionStringValue = parseResult.GetValueForArgument(connectionString);
-        var strictValue = parseResult.GetValueForOption(strict);
-
-        rootCommand.SetHandler(Handle(connectionStringValue, strictValue));
-
-        return rootCommand.Invoke(args);
+        return parseResult.Invoke(new InvocationConfiguration());
     }
 
-    private static Action<InvocationContext> Handle(string connectionString, bool? strict)
+    private static void Handle(string connectionString, bool? strict)
     {
         var settings = MongoClientSettings.FromConnectionString(connectionString);
 
@@ -65,8 +64,6 @@ public static class Example
 
         // prevents https://jira.mongodb.org/browse/CSHARP-3429
         client.Cluster.Dispose();
-
-        return (context) => { };
     }
 
 }
