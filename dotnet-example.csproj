@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0-rc.1.25451.107" />
-    <PackageReference Include="MongoDB.Driver" Version="3.5.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.5.1" />
   </ItemGroup>
 
 </Project>
